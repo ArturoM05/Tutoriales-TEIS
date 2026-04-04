@@ -32,7 +32,7 @@ class CompraService:
         orden = (
             self.builder
             .con_usuario(usuario)
-            .con_libro(libro)
+            .con_productos([libro])
             .con_cantidad(cantidad)
             .para_envio(direccion)
             .build()
@@ -41,23 +41,22 @@ class CompraService:
         pago_exitoso = self.procesador_pago.pagar(orden.total)
         if not pago_exitoso:
             orden.delete()
-            raise Exception("La transacción fue rechazada por el banco.")
-
+            raise Exception(" Error en la pasarela de pagos . ")
+        
         inv.cantidad -= cantidad
         inv.save()
-
         return orden.total
 
 class CompraRapidaService :
     def __init__ ( self , procesador_pago ) :
         self.procesador_pago = procesador_pago
-
+        
     def obtener_detalle_producto(self, libro_id):
         libro = get_object_or_404(Libro, id=libro_id)
         total = CalculadorImpuestos.obtener_total_con_iva(libro.precio)
         return {"libro": libro, "total": total}
     
-    def procesar ( self , libro_id ) :
+    def ejecutar_compra_rapida( self , libro_id ) :
         libro = Libro.objects.get ( id = libro_id )
         inv = Inventario.objects.get ( libro = libro )
 
