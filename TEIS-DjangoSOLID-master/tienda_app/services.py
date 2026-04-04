@@ -1,3 +1,5 @@
+from operator import inv
+
 from django.shortcuts import get_object_or_404
 
 from .domain.builders import OrdenBuilder
@@ -45,3 +47,26 @@ class CompraService:
         inv.save()
 
         return orden.total
+
+class CompraRapidaService :
+    def __init__ ( self , procesador_pago ) :
+        self.procesador_pago = procesador_pago
+
+    def obtener_detalle_producto(self, libro_id):
+        libro = get_object_or_404(Libro, id=libro_id)
+        total = CalculadorImpuestos.obtener_total_con_iva(libro.precio)
+        return {"libro": libro, "total": total}
+    
+    def procesar ( self , libro_id ) :
+        libro = Libro.objects.get ( id = libro_id )
+        inv = Inventario.objects.get ( libro = libro )
+
+        if inv.cantidad <= 0:
+            raise ValueError ( " No hay existencias . " )
+
+        total = CalculadorImpuestos.obtener_total_con_iva ( libro.precio )
+        if self.procesador_pago.pagar( total ) :
+            inv.cantidad -= 1
+            inv.save ()
+            return total
+        return None

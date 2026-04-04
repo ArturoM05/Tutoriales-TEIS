@@ -1,8 +1,9 @@
+from operator import inv
+
 from django.shortcuts import render
 from django.views import View
-
 from .infra.factories import PaymentFactory
-from .services import CompraService
+from .services import CompraService, CompraRapidaService
 
 
 class CompraView(View):
@@ -36,3 +37,34 @@ class CompraView(View):
             )
         except (ValueError, Exception) as e:
             return render(request, self.template_name, {'error': str(e)}, status=400)
+
+
+class CompraRapidaView ( View ) :
+ template_name = 'tienda_app/compra_rapida.html'
+
+ def setup_service(self):
+     gateway = PaymentFactory.get_processor()
+     return CompraRapidaService(procesador_pago=gateway)
+
+ def get ( self , request , libro_id ) :
+    servicio = self.setup_service()
+    contexto = servicio.obtener_detalle_producto(libro_id)
+    return render ( request , self.template_name , contexto )
+
+ def post ( self , request , libro_id ) :
+    servicio = self.setup_service()
+    try:
+        total = servicio.procesar(libro_id)
+        if total is not None:
+            return render(
+                request,
+                self.template_name,
+                {
+                    'mensaje_exito': f"¡Gracias por su compra rápida! Total: ${total}",
+                    'total': total,
+                },
+            )
+        else:
+            return render(request, self.template_name, {'error': "La transacción fue rechazada por el banco."}, status=400)
+    except (ValueError, Exception) as e:
+        return render(request, self.template_name, {'error': str(e)}, status=400)
