@@ -17,7 +17,7 @@ services:
     build : .
     # CAMBIO 1: Usamos Gunicorn en lugar de runserver
     # ’ tienda_project ’ debe ser el nombre de la carpeta donde esta su wsgi . py
-    command : gunicorn tienda.wsgi:application --bind 0.0.0.0:8000
+    command : gunicorn Tienda.wsgi:application --bind 0.0.0.0:8000
 
     volumes:
       # Hot-Reload: Mapeamos la carpeta actual para que los cambios de código se reflejen sin reiniciar
