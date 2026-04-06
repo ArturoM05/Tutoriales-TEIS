@@ -37,7 +37,7 @@ services:
     - "80:80" # Nginx es el unico que da la cara a internet
     volumes :
     # Inyectamos nuestro archivo de configuracion en el contenedor
-    - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on :
     - web
 # Definición del volumen persistente
