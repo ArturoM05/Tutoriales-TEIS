@@ -9,6 +9,7 @@ class OrdenBuilder :
         self._usuario = None
         self._items = []
         self._direccion = " "
+        self._cantidad = 1
     
     def con_usuario ( self , usuario ) :
         self._usuario = usuario
@@ -29,7 +30,7 @@ class OrdenBuilder :
         if not self._items :
             raise ValueError ( " Datos insuficientes para crear la orden . " )
         # Encapsulamos la logica de calculo
-        subtotal = sum ( p . precio for p in self._items )
+        subtotal = sum ( p . precio for p in self._items ) * self._cantidad
         total_con_iva = subtotal * Decimal("1.19")
 
         orden = Orden.objects.create(

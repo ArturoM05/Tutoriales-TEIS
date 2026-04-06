@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventario de Libros</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px 14px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .sin-stock { color: #c00; font-weight: bold; }
+        .con-stock { color: #060; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; }
+        .badge-ok { background: #d4edda; color: #155724; }
+        .badge-vacio { background: #f8d7da; color: #721c24; }
+        small { color: #888; }
+    </style>
+</head>
+<body>
+    <h1>Inventario de Libros</h1>
+    <p><small>Esta vista HTML y el endpoint <code>GET /api/v1/inventario/</code> leen el mismo modelo — ambas "puertas" conducen a la misma "habitación".</small></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Precio base</th>
+                <th>Stock actual</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in inventario %}
+            <tr>
+                <td>{{ item.libro.id }}</td>
+                <td>{{ item.libro.titulo }}</td>
+                <td>${{ item.libro.precio }}</td>
+                <td>
+                    {% if item.cantidad > 0 %}
+                        <span class="con-stock">{{ item.cantidad }}</span>
+                    {% else %}
+                        <span class="sin-stock">0</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.cantidad > 0 %}
+                        <span class="badge badge-ok">En stock</span>
+                    {% else %}
+                        <span class="badge badge-vacio">Agotado</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No hay libros registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
